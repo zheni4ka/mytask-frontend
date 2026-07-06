@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Assignment, CreateAssignmentModel, UpdateAssignmentModel } from '../../models/assignment.model';
+import { environment } from '../../../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +11,7 @@ export class AssignmentService
 {
     private http = inject(HttpClient);
 
-    private apiUrl = 'https://localhost:5196/api/assignments'; 
+    private apiUrl = `${environment.apiUrl}/assignments`; 
 
     getAssignments(): Observable<Assignment[]> {
         return this.http.get<Assignment[]>(this.apiUrl);
