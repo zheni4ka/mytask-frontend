@@ -29,4 +29,10 @@ export class StepService
         return this.http.put<void>(url, step);
     }
 
+    getByAssignmentId(assignmentId: number): Observable<Step[]>
+    {
+        const url = `${this.apiUrl}/by-assignment/${assignmentId}`;
+        return this.http.get<Step[]>(url);
+    }
+
 }

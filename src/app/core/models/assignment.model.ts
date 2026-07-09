@@ -16,6 +16,14 @@ export interface Assignment {
   isCompleted: boolean;
 }
 
+export interface PagedResult<T> {
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+  items: T[];
+}
+
 export interface CreateAssignmentModel {
   title: string;
   description: string;
