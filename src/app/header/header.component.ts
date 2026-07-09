@@ -20,6 +20,7 @@ export class HeaderComponent {
 
   @Output() filterChange = new EventEmitter<{term: string, by: string, desc: boolean}>();
   @Output() newTask = new EventEmitter<void>();
+  @Output() logout = new EventEmitter<void>();
 
   onFilterChange() {
     this.filterChange.emit({

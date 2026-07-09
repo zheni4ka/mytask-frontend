@@ -11,6 +11,7 @@ import { Category, CreateCategoryModel, UpdateCategoryModel } from '../core/mode
 import { Step, CreateStepModel, UpdateStepModel } from '../core/models/step.model';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { HeaderComponent } from '../header/header.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-todo-list',
@@ -22,6 +23,8 @@ export class TodoListComponent implements OnInit {
   private assignmentService = inject(AssignmentService);
   private categoryService = inject(CategoryService);
   private stepService = inject(StepService);
+  private router = inject(Router);
+
 
   tasks: Assignment[] = [];
   categories: Category[] = [];
@@ -42,6 +45,11 @@ export class TodoListComponent implements OnInit {
 
   loadCategories() {
     this.categoryService.getCategories().subscribe(res => this.categories = res);
+  }
+
+  onLogout() {
+    localStorage.removeItem('token');
+    this.router.navigate(['/login']);
   }
 
   loadTasks() {
