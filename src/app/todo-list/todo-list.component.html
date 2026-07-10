@@ -39,14 +39,17 @@
     </div>
   </main>
 
-  <!-- @if (selectedTask) {
-    <app-task-modal
-      [task]="selectedTask"
-      [steps]="taskSteps"
-      [isLoadingSteps]="isLoadingSteps"
-      (closeModal)="selectedTask = null"
-      (stepAdded)="onAddStep($event)"
-      (stepToggled)="onToggleStep($event)">
-    </app-task-modal>
-  } -->
+  @if (selectedTask) {
+  <app-assignment-modal
+    [task]="selectedTask"
+    [categories]="categories"
+    [taskSteps]="taskSteps"
+    
+    (closeModal)="selectedTask = null"
+    (saveTask)="saveTask()"
+    (deleteTask)="deleteTask()"
+    (addStep)="onAddStep($event)"
+    (toggleStep)="onToggleStep($event)">
+  </app-assignment-modal>
+}
 </div>

@@ -30,9 +30,11 @@ export interface CreateAssignmentModel {
   categoryId: number;
   dueDate: string;
   refreshType: RefreshType | null;
+  isCompleted: boolean;
 }
 
 export interface UpdateAssignmentModel {
+  id: number;
   title: string;
   description: string;
   categoryId: number;

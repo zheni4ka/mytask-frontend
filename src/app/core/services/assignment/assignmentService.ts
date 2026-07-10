@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Assignment, CreateAssignmentModel, PagedResult, UpdateAssignmentModel } from '../../models/assignment.model';
 import { environment } from '../../../../environments/environment'
@@ -14,11 +14,28 @@ export class AssignmentService
 
     private apiUrl = `${environment.apiUrl}/Assignment`; 
 
+
     getAssignments(pageNumber: number = 1, pageSize: number = 10, categoryId: number | null, searchTerm: string, sortBy: string, sortDescending: boolean): Observable<PagedResult<Assignment>> {
-    return this.http.get<PagedResult<Assignment>>(
-      `${this.apiUrl}/api/Assignment/all?pageNumber=${pageNumber}&pageSize=${pageSize}&CategoryId=${categoryId}&SearchTerm=${searchTerm}&SortBy=${sortBy}&SortDescending=${sortDescending}`
-    );
-}
+        let params = new HttpParams()
+        .set('pageNumber', pageNumber)
+        .set('pageSize', pageSize)
+        .set('SortDescending', sortDescending);
+
+    if (categoryId) {
+        params = params.set('CategoryId', categoryId);
+    }
+
+    if (searchTerm && searchTerm.trim() !== '') {
+        params = params.set('SearchTerm', searchTerm);
+    }
+
+    if (sortBy) {
+        params = params.set('SortBy', sortBy);
+    }
+    
+     return this.http.get<PagedResult<Assignment>>(`${this.apiUrl}/all`, { params });
+      
+    }
 
     getAssignmentById(id: number): Observable<Assignment> {
         const url = `${this.apiUrl}/${id}`;
@@ -29,10 +46,9 @@ export class AssignmentService
         return this.http.post<Assignment>(this.apiUrl, assignment);
     }
 
-    updateAssignment(id: number, assignment: UpdateAssignmentModel): Observable<void> {
-        const url = `${this.apiUrl}/${id}`;
-        return this.http.put<void>(url, assignment);
-    }
+    updateAssignment(assignment: UpdateAssignmentModel): Observable<void> {
+      return this.http.put<void>(this.apiUrl, assignment);
+  }
 
     deleteAssignment(id: number): Observable<void> {
         const url = `${this.apiUrl}/${id}`;

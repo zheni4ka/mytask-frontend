@@ -18,7 +18,8 @@
         </select>
         
         <button (click)="toggleSort()" class="p-2 border border-gray-200 bg-gray-50 rounded-lg hover:bg-gray-100" title="Змінити напрямок">
-          <span>
+          <span class="flex items-center text-gray-500 text-lg">
+                <ng-icon [name]="sortDescending ? 'heroArrowDownSolid' : 'heroArrowUpSolid'"></ng-icon>
           </span>
         </button>
 
