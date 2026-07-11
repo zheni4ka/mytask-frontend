@@ -1,8 +1,8 @@
 
 export enum RefreshType {
-  Daily = 0,
-  Weekly = 1,
-  Monthly = 2
+  Daily = 1, 
+  Weekly = 2,
+  Monthly = 3
 }
 
 export interface Assignment {
@@ -14,14 +14,9 @@ export interface Assignment {
   dueDate: string; 
   refreshType: RefreshType | null; 
   isCompleted: boolean;
-}
-
-export interface PagedResult<T> {
-  totalCount: number;
-  pageNumber: number;
-  pageSize: number;
-  totalPages: number;
-  items: T[];
+  isImportant: boolean; 
+  totalSteps: number;   
+  completedSteps: number; 
 }
 
 export interface CreateAssignmentModel {
@@ -31,6 +26,7 @@ export interface CreateAssignmentModel {
   dueDate: string;
   refreshType: RefreshType | null;
   isCompleted: boolean;
+  isImportant: boolean; 
 }
 
 export interface UpdateAssignmentModel {
@@ -41,4 +37,12 @@ export interface UpdateAssignmentModel {
   dueDate: string;
   refreshType: RefreshType | null;
   isCompleted: boolean;
+  isImportant: boolean; 
+}
+export interface PagedResult<T> {
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+  items: T[];
 }

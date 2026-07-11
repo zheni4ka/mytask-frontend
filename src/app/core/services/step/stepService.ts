@@ -24,8 +24,8 @@ export class StepService
         return this.http.post<Step>(this.apiUrl, step);
     }
 
-    updateStep(id: number, step: UpdateStepModel): Observable<void> {
-        const url = `${this.apiUrl}/${id}`;
+    updateStep(step: UpdateStepModel): Observable<void> {
+        const url = `${this.apiUrl}`;
         return this.http.put<void>(url, step);
     }
 

@@ -1,0 +1,40 @@
+<div class="flex h-screen bg-gray-50 overflow-hidden">
+  <app-sidebar
+    [categories]="categories"
+    [selectedCategoryId]="selectedCategoryId"
+    (categorySelect)="onCategorySelect($event)"
+  >
+  </app-sidebar>
+
+  <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+    <app-header
+      [selectedCategoryId]="selectedCategoryId"
+      [searchTerm]="searchTerm"
+      [sortBy]="sortBy"
+      [sortDescending]="sortDescending"
+      (filterChange)="onFilterChange($event)"
+      (newTask)="openNewTaskModal()"
+      (logout)="onLogout()"
+    >
+    </app-header>
+
+    <div class="flex-1 overflow-y-auto p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
+        @for (task of tasks; track task.id) {
+          <app-task-card
+            [task]="task"
+            (cardClick)="openTask($event)"
+            (toggleComplete)="onToggleTaskCompletion($event)"
+          >
+          </app-task-card>
+        } @empty {
+          <div
+            class="col-span-full flex flex-col items-center justify-center p-16 text-center bg-white rounded-2xl border border-dashed border-gray-300"
+          >
+            <h3 class="text-lg font-medium text-gray-900 mb-1">Завдань не знайдено</h3>
+          </div>
+        }
+      </div>
+    </div>
+  </main>
+</div>

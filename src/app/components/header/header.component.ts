@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { heroMagnifyingGlassCircleSolid, heroArrowUpSolid, heroArrowDownSolid } from '@ng-icons/heroicons/solid';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 
+
 @Component({
   selector: 'app-header',
   standalone: true,

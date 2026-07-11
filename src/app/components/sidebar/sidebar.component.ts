@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Category } from '../core/models/category.model';
+import { Category } from '../../core/models/category.model';
 
 import { heroPencilSquareSolid } from '@ng-icons/heroicons/solid';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';

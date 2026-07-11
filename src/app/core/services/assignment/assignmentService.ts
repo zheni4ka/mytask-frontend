@@ -15,27 +15,27 @@ export class AssignmentService
     private apiUrl = `${environment.apiUrl}/Assignment`; 
 
 
-    getAssignments(pageNumber: number = 1, pageSize: number = 10, categoryId: number | null, searchTerm: string, sortBy: string, sortDescending: boolean): Observable<PagedResult<Assignment>> {
-        let params = new HttpParams()
+    getAssignments(pageNumber: number = 1, pageSize: number = 10, categoryId: number | null, searchTerm: string, sortBy: string, sortDescending: boolean, isImportant?: boolean): Observable<PagedResult<Assignment>> {
+    let params = new HttpParams()
         .set('pageNumber', pageNumber)
         .set('pageSize', pageSize)
         .set('SortDescending', sortDescending);
 
-    if (categoryId) {
+    if (categoryId && categoryId > 0) { 
         params = params.set('CategoryId', categoryId);
     }
-
     if (searchTerm && searchTerm.trim() !== '') {
         params = params.set('SearchTerm', searchTerm);
     }
-
     if (sortBy) {
         params = params.set('SortBy', sortBy);
     }
-    
-     return this.http.get<PagedResult<Assignment>>(`${this.apiUrl}/all`, { params });
-      
+    if (isImportant !== undefined && isImportant !== null) {
+        params = params.set('IsImportant', isImportant);
     }
+    
+    return this.http.get<PagedResult<Assignment>>(`${this.apiUrl}/all`, { params });
+}
 
     getAssignmentById(id: number): Observable<Assignment> {
         const url = `${this.apiUrl}/${id}`;
