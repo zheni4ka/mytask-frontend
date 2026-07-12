@@ -141,7 +141,7 @@ export class TodoListComponent implements OnInit {
       description: '',
       categoryId: this.selectedCategoryId || (this.categories.length > 0 ? this.categories[0].id : 0),
       userId: '',
-      dueDate: new Date().toISOString().slice(0, 16), // Format for datetime-local
+      dueDate: new Date().toISOString().slice(0, 16), 
       refreshType: null,
       isCompleted: false,
       isImportant: false,
