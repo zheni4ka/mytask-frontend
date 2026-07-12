@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AssignmentService } from '../../core/services/assignment/assignmentService';
@@ -28,6 +28,7 @@ export class TodoListComponent implements OnInit {
   private stepService = inject(StepService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private cdr = inject(ChangeDetectorRef);
 
   currentPage = 1;
   pageSize = 10;
@@ -40,6 +41,7 @@ export class TodoListComponent implements OnInit {
   searchTerm = '';
   sortBy = 'duedate';
   sortDescending = false;
+  isImportantFilter : boolean | null = null;
 
   selectedTask: Assignment | null = null;
   taskSteps: Step[] = [];
@@ -50,11 +52,19 @@ export class TodoListComponent implements OnInit {
 
     this.route.queryParams.subscribe(params => {
       const categoryIdParam = params['category']; 
-      
+      const importantParam = params['important'];
+
+      if(importantParam === 'true')
+      {{
+        this.selectedCategoryId = null;
+        this.isImportantFilter = null
+      }}
       if (categoryIdParam) {
         this.selectedCategoryId = Number(categoryIdParam);
+        this.isImportantFilter = null;
       } else {
         this.selectedCategoryId = null;
+        this.isImportantFilter = null;
       }
 
       this.loadTasks(); 
@@ -63,6 +73,7 @@ export class TodoListComponent implements OnInit {
 
   loadCategories() {
     this.categoryService.getCategories().subscribe(res => this.categories = res);
+    this.cdr.detectChanges();
   }
 
   onLogout() {
@@ -78,32 +89,38 @@ export class TodoListComponent implements OnInit {
     this.pageSize, 
     this.selectedCategoryId, 
     this.searchTerm, 
-    this.sortBy, 
-    this.sortDescending
+    this.sortBy,
+    this.sortDescending,
+    this.isImportantFilter
   ).subscribe({
     next: (res: PagedResult<Assignment>) => { 
       this.tasks = res.items;
       this.totalPages = res.totalPages;
+      this.cdr.detectChanges();
     },
     error: (err) => console.error('Помилка завантаження тасок:', err)
   });
 }
   
 
-  onCategorySelect(id: number | null) {
+  onSidebarSelect(filter: {categoryId: number | null, important: boolean | null}) {
     this.searchTerm = ''; 
+    this.currentPage = 1; 
+    
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { category: id }, 
-      queryParamsHandling: 'merge'   
+      queryParams: { 
+        category: filter.categoryId,
+        important: filter.important ? 'true' : null 
+      }
     });
   }
 
-  onFilterChange(filters: {term: string, by: string, desc: boolean}) {
+  onFilterChange(filters: {term: string, by: string, desc: boolean, categoryId : number | null}) {
     this.searchTerm = filters.term;
     this.sortBy = filters.by;
     this.sortDescending = filters.desc;
-    this.selectedCategoryId = 0; 
+    this.selectedCategoryId = filters.categoryId; 
     this.loadTasks();
   }
 
@@ -155,43 +172,6 @@ export class TodoListComponent implements OnInit {
     });
   }
 
-  onAddStep(title: string) {
-  if (!this.selectedTask || !this.selectedTask.id || !title.trim()) return;
-  
-  const newStep: CreateStepModel = {
-    title: title.trim(),
-    assignmentId: this.selectedTask.id,
-    isCompleted: false
-  };
-
-  this.stepService.createStep(newStep).subscribe({
-    next: () => {
-      this.openTask(this.selectedTask!); 
-      this.loadTasks(); 
-    },
-    error: (err) => console.error('Помилка створення кроку:', err)
-  });
-}
-
-onToggleStep(step: Step) {
-  const updatedStep: UpdateStepModel = {
-    id: step.id,
-    title: step.title,
-    assignmentId: step.assignmentId,
-    isCompleted: !step.isCompleted
-  };
-
-  this.stepService.updateStep(updatedStep).subscribe({
-    next: () => {
-      step.isCompleted = updatedStep.isCompleted; 
-      this.loadTasks(); 
-    },
-    error: (err) => {
-      console.error('Помилка оновлення кроку:', err);
-      step.isCompleted = !updatedStep.isCompleted; 
-    }
-  });
-}
 
   saveTask(taskToSave: Assignment) {
     if (taskToSave.id === 0) {
@@ -226,7 +206,6 @@ onToggleStep(step: Step) {
         error: (err) => console.error('Помилка оновлення:', err)
       });
     }
-    this.loadTasks()
   }
 
   deleteTask(taskId: number) {

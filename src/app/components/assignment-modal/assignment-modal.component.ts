@@ -6,6 +6,7 @@ import { Assignment } from '../../core/models/assignment.model';
 import { Category } from '../../core/models/category.model';
 import { Step, CreateStepModel, UpdateStepModel } from '../../core/models/step.model';
 import { StepService } from '../../core/services/step/stepService';
+import { ChangeDetectorRef } from '@angular/core';
 
 export interface AssignmentModalData {
   task: Assignment;
@@ -21,6 +22,8 @@ export interface AssignmentModalData {
 })
 export class AssignmentModalComponent {
   private stepService = inject(StepService);
+  private cdr = inject(ChangeDetectorRef);
+
   
   
   task: Assignment;
@@ -60,6 +63,7 @@ export class AssignmentModalComponent {
       next: () => {
         this.newStepTitle = '';
         this.reloadSteps(); 
+        this.cdr.detectChanges();
       },
       error: (err) => console.error('Помилка додавання кроку:', err)
     });

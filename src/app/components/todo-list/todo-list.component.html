@@ -1,10 +1,9 @@
 <div class="flex h-screen bg-gray-50 overflow-hidden">
-  <app-sidebar
-    [categories]="categories"
-    [selectedCategoryId]="selectedCategoryId"
-    (categorySelect)="onCategorySelect($event)"
-  >
-  </app-sidebar>
+<app-sidebar 
+  [categories]="categories" 
+  [selectedCategoryId]="selectedCategoryId"
+  [isImportantSelected]="isImportantFilter"
+  (filterSelect)="onSidebarSelect($event)"> </app-sidebar>
 
   <main class="flex-1 flex flex-col h-full overflow-hidden relative">
     <app-header

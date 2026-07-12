@@ -16,9 +16,11 @@ import { NgIconComponent, provideIcons } from '@ng-icons/core';
 export class SidebarComponent {
   @Input() categories: Category[] = [];
   @Input() selectedCategoryId: number | null = null;
-  @Output() categorySelect = new EventEmitter<number | null>();
+  @Input() isImportantSelected: boolean | null = null;
 
-  onSelect(id: number | null) {
-    this.categorySelect.emit(id);
+  @Output() filterSelect = new EventEmitter<{categoryId: number | null, important: boolean | null}>();
+
+  onSelect(id: number | null, important: boolean | null) {
+    this.filterSelect.emit({ categoryId: id, important: important });
   }
 }

@@ -15,7 +15,13 @@ export class AssignmentService
     private apiUrl = `${environment.apiUrl}/Assignment`; 
 
 
-    getAssignments(pageNumber: number = 1, pageSize: number = 10, categoryId: number | null, searchTerm: string, sortBy: string, sortDescending: boolean, isImportant?: boolean): Observable<PagedResult<Assignment>> {
+    getAssignments(pageNumber: number = 1, 
+        pageSize: number = 10, 
+        categoryId: number | null, 
+        searchTerm: string, 
+        sortBy: string, 
+        sortDescending: boolean, 
+        isImportant: boolean | null): Observable<PagedResult<Assignment>> {
     let params = new HttpParams()
         .set('pageNumber', pageNumber)
         .set('pageSize', pageSize)
@@ -27,13 +33,14 @@ export class AssignmentService
     if (searchTerm && searchTerm.trim() !== '') {
         params = params.set('SearchTerm', searchTerm);
     }
+    if (isImportant !== undefined && isImportant !== null) {
+        params = params.set('IsImportant', isImportant.toString());
+    }
     if (sortBy) {
         params = params.set('SortBy', sortBy);
     }
-    if (isImportant !== undefined && isImportant !== null) {
-        params = params.set('IsImportant', isImportant);
-    }
     
+    console.log(params);
     return this.http.get<PagedResult<Assignment>>(`${this.apiUrl}/all`, { params });
 }
 
@@ -53,29 +60,6 @@ export class AssignmentService
     deleteAssignment(id: number): Observable<void> {
         const url = `${this.apiUrl}/${id}`;
         return this.http.delete<void>(url);
-    }
-
-    getLatestByCategoryId(id: number): Observable<Assignment> {
-        const url = `${this.apiUrl}/latest/${id}`
-        return this.http.get<Assignment>(url);
-    }
-
-    getByCategoryId(id: number): Observable<Assignment[]>
-    {
-        const url = `${this.apiUrl}/by-category/${id}`
-        return this.http.get<Assignment[]>(url);
-    }
-
-    getOverdueAssignments(): Observable<Assignment[]>
-    {
-        const url = `${this.apiUrl}/overdue`;
-        return this.http.get<Assignment[]>(url);
-    }
-
-    getUpcomingAssignments(days: number) : Observable<Assignment[]>
-    {
-        const url = `${this.apiUrl}/upcoming/${days}`;
-        return this.http.get<Assignment[]>(url);
     }
 
 }

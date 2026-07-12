@@ -19,7 +19,8 @@ export class HeaderComponent {
   @Input() sortBy = 'duedate';
   @Input() sortDescending = false;
 
-  @Output() filterChange = new EventEmitter<{term: string, by: string, desc: boolean}>();
+
+  @Output() filterChange = new EventEmitter<{term: string, by: string, desc: boolean, categoryId: number | null}>();
   @Output() newTask = new EventEmitter<void>();
   @Output() logout = new EventEmitter<void>();
 
@@ -27,7 +28,8 @@ export class HeaderComponent {
     this.filterChange.emit({
       term: this.searchTerm,
       by: this.sortBy,
-      desc: this.sortDescending
+      desc: this.sortDescending,
+      categoryId: this.selectedCategoryId
     });
   }
 
