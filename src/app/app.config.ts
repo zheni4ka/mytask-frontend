@@ -5,9 +5,34 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './core/interceptors/auth/auth-interceptor';
 import { errorInterceptor } from './core/interceptors/error/error-interceptor';
 
+import {
+  SocialLoginModule,
+  SocialAuthServiceConfig,
+  GoogleLoginProvider,
+  SOCIAL_AUTH_CONFIG,
+} from '@abacritt/angularx-social-login';
+import { environment } from '../environments/environment';
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])) 
-  ]
+    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
+    {
+      provide: SOCIAL_AUTH_CONFIG,
+      useValue: {
+        autoLogin: false,
+        providers: [
+          {
+            id: GoogleLoginProvider.PROVIDER_ID,
+            provider: new GoogleLoginProvider(environment.googleAPIkey, {
+              scopes: 'profile email https://www.googleapis.com/auth/calendar.events',
+            }),
+          },
+        ],
+        onError: (err) => {
+          console.error(err);
+        },
+      } as SocialAuthServiceConfig,
+    },
+  ],
 };

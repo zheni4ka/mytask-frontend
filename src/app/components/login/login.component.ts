@@ -1,26 +1,49 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth/authService';
+import { SocialAuthService, GoogleSigninButtonModule } from '@abacritt/angularx-social-login';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule], 
-  templateUrl: './login.component.html',
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, GoogleSigninButtonModule],
+  templateUrl: './login.component.html'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private socialAuthService = inject(SocialAuthService); 
 
-  loginForm = this.fb.group({
+  loginForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]]
+    password: ['', [Validators.required]]
   });
 
   errorMessage = '';
+  isLoading = false;
+
+  ngOnInit() {
+    this.socialAuthService.authState.subscribe((user) => {
+      if (user) {
+        this.isLoading = true;
+        
+        this.authService.loginWithGoogle(user.idToken).subscribe({
+          next: (res) => {
+            localStorage.setItem('token', res.token || res.accessToken); 
+            this.router.navigate(['/']);
+          },
+          error: (err) => {
+            console.error(err);
+            this.errorMessage = 'Помилка авторизації через Google';
+            this.isLoading = false;
+          }
+        });
+      }
+    });
+  }
   
   onSubmit() {
     if (this.loginForm.invalid) return;

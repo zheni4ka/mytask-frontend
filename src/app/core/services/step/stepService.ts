@@ -6,33 +6,35 @@ import { environment } from '../../../../environments/environment';
 @Injectable({
   providedIn: 'root',
 })
-export class StepService 
-{
-    private http = inject(HttpClient);
-    private apiUrl = `${environment.apiUrl}/steps`;
+export class StepService {
+  private http = inject(HttpClient);
+  private apiUrl = `${environment.apiUrl}/steps`;
 
-    getSteps(): Observable<Step[]> {
-        return this.http.get<Step[]>(this.apiUrl);
-    }
+  getSteps(): Observable<Step[]> {
+    return this.http.get<Step[]>(this.apiUrl);
+  }
 
-    getStepById(id: number): Observable<Step> {
-        const url = `${this.apiUrl}/${id}`;
-        return this.http.get<Step>(url);
-    }
+  getStepById(id: number): Observable<Step> {
+    const url = `${this.apiUrl}/${id}`;
+    return this.http.get<Step>(url);
+  }
 
-    createStep(step: CreateStepModel): Observable<Step> {
-        return this.http.post<Step>(this.apiUrl, step);
-    }
+  createStep(step: CreateStepModel): Observable<Step> {
+    return this.http.post<Step>(this.apiUrl, step);
+  }
 
-    updateStep(step: UpdateStepModel): Observable<void> {
-        const url = `${this.apiUrl}`;
-        return this.http.put<void>(url, step);
-    }
+  updateStep(step: UpdateStepModel): Observable<void> {
+    const url = `${this.apiUrl}`;
+    return this.http.put<void>(url, step);
+  }
 
-    getByAssignmentId(assignmentId: number): Observable<Step[]>
-    {
-        const url = `${this.apiUrl}/by-assignment/${assignmentId}`;
-        return this.http.get<Step[]>(url);
-    }
+  deleteStep(id: number): Observable<void> {
+    const url = `${this.apiUrl}/${id}`;
+    return this.http.delete<void>(url);
+  }
 
+  getByAssignmentId(assignmentId: number): Observable<Step[]> {
+    const url = `${this.apiUrl}/by-assignment/${assignmentId}`;
+    return this.http.get<Step[]>(url);
+  }
 }

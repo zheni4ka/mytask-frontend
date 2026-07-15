@@ -6,7 +6,7 @@ import { LoginComponent } from './components/login/login.component';
   selector: 'app-root',
   imports: [LoginComponent, RouterOutlet],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css',
 })
 export class App {
   protected readonly title = signal('mytask-frontend');

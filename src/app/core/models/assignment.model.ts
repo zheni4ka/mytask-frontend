@@ -1,8 +1,7 @@
-
 export enum RefreshType {
-  Daily = 1, 
+  Daily = 1,
   Weekly = 2,
-  Monthly = 3
+  Monthly = 3,
 }
 
 export interface Assignment {
@@ -11,12 +10,13 @@ export interface Assignment {
   description: string;
   categoryId: number;
   userId: string;
-  dueDate: string; 
-  refreshType: RefreshType | null; 
+  dueDate: string;
+  refreshType: RefreshType | null;
   isCompleted: boolean;
-  isImportant: boolean; 
-  totalSteps: number;   
-  completedSteps: number; 
+  isImportant: boolean;
+  totalSteps: number;
+  completedSteps: number;
+  googleEventId?: string | null;
 }
 
 export interface CreateAssignmentModel {
@@ -26,7 +26,7 @@ export interface CreateAssignmentModel {
   dueDate: string;
   refreshType: RefreshType | null;
   isCompleted: boolean;
-  isImportant: boolean; 
+  isImportant: boolean;
 }
 
 export interface UpdateAssignmentModel {
@@ -37,7 +37,7 @@ export interface UpdateAssignmentModel {
   dueDate: string;
   refreshType: RefreshType | null;
   isCompleted: boolean;
-  isImportant: boolean; 
+  isImportant: boolean;
 }
 export interface PagedResult<T> {
   totalCount: number;

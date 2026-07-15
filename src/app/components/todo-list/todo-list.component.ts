@@ -7,8 +7,17 @@ import { StepService } from '../../core/services/step/stepService';
 import { MatDialog } from '@angular/material/dialog';
 
 import { TaskCardComponent } from '../task-card/task-card.component';
-import { Assignment, CreateAssignmentModel, PagedResult, UpdateAssignmentModel } from '../../core/models/assignment.model';
-import { Category, CreateCategoryModel, UpdateCategoryModel } from '../../core/models/category.model';
+import {
+  Assignment,
+  CreateAssignmentModel,
+  PagedResult,
+  UpdateAssignmentModel,
+} from '../../core/models/assignment.model';
+import {
+  Category,
+  CreateCategoryModel,
+  UpdateCategoryModel,
+} from '../../core/models/category.model';
 import { Step, CreateStepModel, UpdateStepModel } from '../../core/models/step.model';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { HeaderComponent } from '../header/header.component';
@@ -19,7 +28,7 @@ import { Router, ActivatedRoute } from '@angular/router';
   selector: 'app-todo-list',
   standalone: true,
   imports: [CommonModule, FormsModule, SidebarComponent, HeaderComponent, TaskCardComponent],
-  templateUrl: './todo-list.component.html'
+  templateUrl: './todo-list.component.html',
 })
 export class TodoListComponent implements OnInit {
   private dialog = inject(MatDialog);
@@ -41,7 +50,7 @@ export class TodoListComponent implements OnInit {
   searchTerm = '';
   sortBy = 'duedate';
   sortDescending = false;
-  isImportantFilter : boolean | null = null;
+  isImportantFilter: boolean | null = null;
 
   selectedTask: Assignment | null = null;
   taskSteps: Step[] = [];
@@ -50,16 +59,16 @@ export class TodoListComponent implements OnInit {
   ngOnInit() {
     this.loadCategories();
 
-    this.route.queryParams.subscribe(params => {
-      const categoryIdParam = params['category']; 
+    this.route.queryParams.subscribe((params) => {
+      const categoryIdParam = params['category'];
       const importantParam = params['important'];
 
-      if(importantParam === 'true')
-      {{
-        this.selectedCategoryId = null;
-        this.isImportantFilter = null
-      }}
-      if (categoryIdParam) {
+      if (importantParam === 'true') {
+        {
+          this.selectedCategoryId = null;
+          this.isImportantFilter = true;
+        }
+      } else if (categoryIdParam) {
         this.selectedCategoryId = Number(categoryIdParam);
         this.isImportantFilter = null;
       } else {
@@ -67,12 +76,12 @@ export class TodoListComponent implements OnInit {
         this.isImportantFilter = null;
       }
 
-      this.loadTasks(); 
+      this.loadTasks();
     });
   }
 
   loadCategories() {
-    this.categoryService.getCategories().subscribe(res => this.categories = res);
+    this.categoryService.getCategories().subscribe((res) => (this.categories = res));
     this.cdr.detectChanges();
   }
 
@@ -81,72 +90,90 @@ export class TodoListComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  
-
   loadTasks() {
-  this.assignmentService.getAssignments(
-    this.currentPage, 
-    this.pageSize, 
-    this.selectedCategoryId, 
-    this.searchTerm, 
-    this.sortBy,
-    this.sortDescending,
-    this.isImportantFilter
-  ).subscribe({
-    next: (res: PagedResult<Assignment>) => { 
-      this.tasks = res.items;
-      this.totalPages = res.totalPages;
-      this.cdr.detectChanges();
-    },
-    error: (err) => console.error('Помилка завантаження тасок:', err)
-  });
-}
-  
+    this.assignmentService
+      .getAssignments(
+        this.currentPage,
+        this.pageSize,
+        this.selectedCategoryId,
+        this.searchTerm,
+        this.sortBy,
+        this.sortDescending,
+        this.isImportantFilter,
+      )
+      .subscribe({
+        next: (res: PagedResult<Assignment>) => {
+          this.tasks = res.items;
+          this.totalPages = res.totalPages;
+          this.cdr.detectChanges();
+        },
+        error: (err) => console.error('Помилка завантаження тасок:', err),
+      });
+  }
 
-  onSidebarSelect(filter: {categoryId: number | null, important: boolean | null}) {
-    this.searchTerm = ''; 
-    this.currentPage = 1; 
-    
+  onSidebarSelect(filter: { categoryId: number | null; important: boolean | null }) {
+    this.searchTerm = '';
+    this.currentPage = 1;
+
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { 
+      queryParams: {
         category: filter.categoryId,
-        important: filter.important ? 'true' : null 
-      }
+        important: filter.important ? 'true' : null,
+      },
     });
   }
 
-  onFilterChange(filters: {term: string, by: string, desc: boolean, categoryId : number | null}) {
+  onCategoriesChanged() {
+    this.categoryService.getCategories().subscribe({
+      next: (res) => {
+        this.categories = res;
+
+        const categoryExists = this.categories.some((c) => c.id === this.selectedCategoryId);
+
+        if (!categoryExists && this.selectedCategoryId !== null) {
+          this.onSidebarSelect({ categoryId: null, important: null });
+        } else {
+          this.loadTasks();
+        }
+
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Помилка завантаження категорій:', err),
+    });
+  }
+
+  onFilterChange(filters: { term: string; by: string; desc: boolean; categoryId: number | null }) {
     this.searchTerm = filters.term;
     this.sortBy = filters.by;
     this.sortDescending = filters.desc;
-    this.selectedCategoryId = filters.categoryId; 
+    this.selectedCategoryId = filters.categoryId;
     this.loadTasks();
   }
-
 
   openTask(task: Assignment) {
     this.stepService.getByAssignmentId(task.id).subscribe({
       next: (steps) => {
         this.openDialog(task, steps);
       },
-      error: () => this.openDialog(task, [])
+      error: () => this.openDialog(task, []),
     });
   }
 
   openNewTaskModal() {
     const newTask: Assignment = {
-      id: 0, 
+      id: 0,
       title: '',
       description: '',
-      categoryId: this.selectedCategoryId || (this.categories.length > 0 ? this.categories[0].id : 0),
+      categoryId:
+        this.selectedCategoryId || (this.categories.length > 0 ? this.categories[0].id : 0),
       userId: '',
-      dueDate: new Date().toISOString().slice(0, 16), 
+      dueDate: new Date().toISOString().slice(0, 16),
       refreshType: null,
       isCompleted: false,
       isImportant: false,
       totalSteps: 0,
-      completedSteps: 0
+      completedSteps: 0,
     };
     this.openDialog(newTask, []);
   }
@@ -155,11 +182,11 @@ export class TodoListComponent implements OnInit {
     const dialogRef = this.dialog.open(AssignmentModalComponent, {
       width: '700px',
       maxWidth: '95vw',
-      panelClass: 'custom-dialog-container', 
-      data: { task, categories: this.categories, taskSteps }
+      panelClass: 'custom-dialog-container',
+      data: { task, categories: this.categories, taskSteps },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         if (result.action === 'save') {
           this.saveTask(result.task);
@@ -167,27 +194,26 @@ export class TodoListComponent implements OnInit {
           this.deleteTask(result.taskId);
         }
       } else {
-        this.loadTasks(); 
+        this.loadTasks();
       }
     });
   }
-
 
   saveTask(taskToSave: Assignment) {
     if (taskToSave.id === 0) {
       const newTask: CreateAssignmentModel = {
         title: taskToSave.title,
-        description: taskToSave.description || '', 
+        description: taskToSave.description || '',
         categoryId: Number(taskToSave.categoryId),
         dueDate: taskToSave.dueDate,
         refreshType: taskToSave.refreshType,
         isCompleted: taskToSave.isCompleted,
-        isImportant: taskToSave.isImportant
+        isImportant: taskToSave.isImportant,
       };
 
       this.assignmentService.createAssignment(newTask).subscribe({
         next: () => this.loadTasks(),
-        error: (err) => console.error('Помилка створення:', err)
+        error: (err) => console.error('Помилка створення:', err),
       });
     } else {
       const updatedTask: UpdateAssignmentModel = {
@@ -198,12 +224,12 @@ export class TodoListComponent implements OnInit {
         dueDate: taskToSave.dueDate,
         refreshType: taskToSave.refreshType,
         isCompleted: taskToSave.isCompleted,
-        isImportant: taskToSave.isImportant
+        isImportant: taskToSave.isImportant,
       };
 
       this.assignmentService.updateAssignment(updatedTask).subscribe({
         next: () => this.loadTasks(),
-        error: (err) => console.error('Помилка оновлення:', err)
+        error: (err) => console.error('Помилка оновлення:', err),
       });
     }
   }
@@ -211,16 +237,15 @@ export class TodoListComponent implements OnInit {
   deleteTask(taskId: number) {
     this.assignmentService.deleteAssignment(taskId).subscribe({
       next: () => this.loadTasks(),
-      error: (err) => console.error('Помилка видалення:', err)
+      error: (err) => console.error('Помилка видалення:', err),
     });
 
     this.loadTasks();
-
   }
 
   onToggleTaskCompletion(task: Assignment) {
     const originalStatus = task.isCompleted;
-    
+
     task.isCompleted = !task.isCompleted;
 
     const updatedTask: UpdateAssignmentModel = {
@@ -231,7 +256,7 @@ export class TodoListComponent implements OnInit {
       dueDate: task.dueDate,
       refreshType: task.refreshType,
       isCompleted: task.isCompleted,
-      isImportant: task.isImportant
+      isImportant: task.isImportant,
     };
 
     this.assignmentService.updateAssignment(updatedTask).subscribe({
@@ -243,8 +268,7 @@ export class TodoListComponent implements OnInit {
       error: (err) => {
         console.error('Помилка оновлення статусу:', err);
         task.isCompleted = originalStatus;
-      }
+      },
     });
   }
-
 }

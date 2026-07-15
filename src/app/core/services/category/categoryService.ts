@@ -6,26 +6,29 @@ import { environment } from '../../../../environments/environment';
 @Injectable({
   providedIn: 'root',
 })
-export class CategoryService 
-{
-    private http = inject(HttpClient);
-    private apiUrl = `${environment.apiUrl}/categories`;
-    
-    getCategories(): Observable<Category[]> {
-        return this.http.get<Category[]>(this.apiUrl);
-    }
+export class CategoryService {
+  private http = inject(HttpClient);
+  private apiUrl = `${environment.apiUrl}/Categories`;
 
-    getCategoryById(id: number): Observable<Category> {
-        const url = `${this.apiUrl}/${id}`;
-        return this.http.get<Category>(url);
-    }
+  getCategories(): Observable<Category[]> {
+    return this.http.get<Category[]>(this.apiUrl);
+  }
 
-    createCategory(category: CreateCategoryModel): Observable<Category> {
-        return this.http.post<Category>(this.apiUrl, category);
-    }
+  getCategoryById(id: number): Observable<Category> {
+    const url = `${this.apiUrl}/${id}`;
+    return this.http.get<Category>(url);
+  }
 
-    updateCategory(id: number, category: UpdateCategoryModel): Observable<void> {
-        const url = `${this.apiUrl}/${id}`;
-        return this.http.put<void>(url, category);
-    }
+  createCategory(category: CreateCategoryModel): Observable<Category> {
+    return this.http.post<Category>(this.apiUrl, category);
+  }
+
+  updateCategory(category: UpdateCategoryModel): Observable<void> {
+    const url = `${this.apiUrl}`;
+    return this.http.put<void>(url, category);
+  }
+
+  deleteCategory(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 }

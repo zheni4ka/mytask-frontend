@@ -1,28 +1,46 @@
 <div class="flex flex-col h-full bg-white">
-  
-  <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-start bg-gray-50/50 m-0">
+  <div
+    class="px-6 py-5 border-b border-gray-100 flex justify-between items-start bg-gray-50/50 m-0"
+  >
     <div class="w-full mr-4">
       <div class="flex items-center gap-2 mb-2">
-        <button (click)="task.isImportant = !task.isImportant" class="text-2xl focus:outline-none" 
-                [class.text-yellow-400]="task.isImportant" [class.text-gray-300]="!task.isImportant">
+        <button
+          (click)="task.isImportant = !task.isImportant"
+          class="text-2xl focus:outline-none"
+          [class.text-yellow-400]="task.isImportant"
+          [class.text-gray-300]="!task.isImportant"
+        >
           ★
         </button>
-        <input type="text" [(ngModel)]="task.title" placeholder="Назва завдання..."
-               class="w-full text-2xl font-bold text-gray-900 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 outline-none transition-colors">
+        <input
+          type="text"
+          [(ngModel)]="task.title"
+          placeholder="Назва завдання..."
+          class="w-full text-2xl font-bold text-gray-900 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 outline-none transition-colors"
+        />
       </div>
-      
+
       <div class="flex flex-wrap gap-3 text-sm text-gray-500 items-center pl-8">
-        <select [(ngModel)]="task.categoryId" class="bg-white border border-gray-200 px-2 py-1 rounded-md outline-none">
+        <select
+          [(ngModel)]="task.categoryId"
+          class="bg-white border border-gray-200 px-2 py-1 rounded-md outline-none"
+        >
           <option [value]="0" disabled>Виберіть категорію</option>
           @for (category of categories; track category.id) {
             <option [value]="category.id">{{ category.name }}</option>
           }
         </select>
 
-        <input type="datetime-local" [(ngModel)]="task.dueDate" 
-               class="bg-white border border-gray-200 px-2 py-1 rounded-md outline-none">
-        
-        <select [(ngModel)]="task.refreshType" class="bg-white border border-gray-200 px-2 py-1 rounded-md outline-none">
+        <input
+          type="datetime-local"
+          [(ngModel)]="task.dueDate"
+          class="bg-white border border-gray-200 px-2 py-1 rounded-md outline-none"
+        />
+
+        <select
+          [(ngModel)]="task.refreshType"
+          class="bg-white border border-gray-200 px-2 py-1 rounded-md outline-none"
+        >
           <option [ngValue]="null">Не повторювати</option>
           <option [ngValue]="1">Щодня</option>
           <option [ngValue]="2">Щотижня</option>
@@ -30,7 +48,10 @@
         </select>
       </div>
     </div>
-    <button mat-dialog-close class="text-gray-400 hover:text-gray-700 bg-white hover:bg-gray-100 rounded-full p-2 transition-colors">
+    <button
+      mat-dialog-close
+      class="text-gray-400 hover:text-gray-700 bg-white hover:bg-gray-100 rounded-full p-2 transition-colors"
+    >
       ✕
     </button>
   </div>
@@ -38,29 +59,95 @@
   <div mat-dialog-content class="p-6 overflow-y-auto bg-white !max-h-[60vh] custom-scrollbar">
     <div class="mb-8">
       <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Опис завдання</h3>
-      <textarea [(ngModel)]="task.description" rows="3" placeholder="Додайте опис..."
-                class="w-full text-gray-700 bg-gray-50 p-4 rounded-xl border border-gray-100 outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+      <textarea
+        [(ngModel)]="task.description"
+        rows="3"
+        placeholder="Додайте опис..."
+        class="w-full text-gray-700 bg-gray-50 p-4 rounded-xl border border-gray-100 outline-none focus:ring-2 focus:ring-blue-500"
+      ></textarea>
     </div>
 
     @if (task.id !== 0) {
       <div>
-        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Кроки виконання</h3>
+        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">
+          Кроки виконання
+        </h3>
         <div class="space-y-2 mb-5">
           @for (step of taskSteps; track step.id) {
-            <label class="flex items-center gap-4 p-3 bg-white border border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-sm cursor-pointer transition-all">
-              <input type="checkbox" [checked]="step.isCompleted" (change)="onToggleStep(step)"
-                     class="w-5 h-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-              <span [class.line-through]="step.isCompleted" class="text-gray-800 font-medium select-none flex-1">
-                {{ step.title }}
-              </span>
-            </label>
+            <li
+              class="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg group border border-transparent hover:border-gray-200"
+            >
+              @if (editingStepId !== step.id) {
+                <div
+                  class="flex items-center gap-3 w-full cursor-pointer"
+                  (click)="onToggleStep(step)"
+                >
+                  <input
+                    type="checkbox"
+                    [checked]="step.isCompleted"
+                    class="w-4 h-4 text-blue-600 rounded cursor-pointer"
+                  />
+                  <span
+                    [class.line-through]="step.isCompleted"
+                    class="text-sm text-gray-700 w-full"
+                    >{{ step.title }}</span
+                  >
+                </div>
+
+                <div class="flex opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    (click)="startEditStep(step)"
+                    class="p-1 text-gray-400 hover:text-blue-600"
+                  >
+                    <ng-icon name="matEdit" class="text-lg"></ng-icon>
+                  </button>
+                  <button
+                    (click)="deleteStep(step.id)"
+                    class="p-1 text-gray-400 hover:text-red-600"
+                  >
+                    <ng-icon name="matDelete" class="text-lg"></ng-icon>
+                  </button>
+                </div>
+              }
+
+              @if (editingStepId === step.id) {
+                <div class="flex items-center w-full gap-2">
+                  <input
+                    type="text"
+                    [(ngModel)]="editingStepTitle"
+                    (keyup.enter)="saveEditStep(step)"
+                    class="w-full text-sm px-2 py-1 border border-blue-400 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    autofocus
+                  />
+                  <button
+                    (click)="saveEditStep(step)"
+                    class="text-green-600 hover:bg-green-100 p-1 rounded-md"
+                  >
+                    <ng-icon name="matCheck" class="text-lg"></ng-icon>
+                  </button>
+                  <button
+                    (click)="cancelEditStep()"
+                    class="text-gray-500 hover:bg-gray-200 p-1 rounded-md"
+                  >
+                    <ng-icon name="matClose" class="text-lg"></ng-icon>
+                  </button>
+                </div>
+              }
+            </li>
           }
         </div>
         <div class="flex gap-2">
-          <input type="text" [(ngModel)]="newStepTitle" (keyup.enter)="onAddStep()" placeholder="Що потрібно зробити?" 
-                 class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none">
-          <button (click)="onAddStep()" 
-                  class="bg-gray-900 hover:bg-black text-white px-6 py-3 rounded-xl font-medium">
+          <input
+            type="text"
+            [(ngModel)]="newStepTitle"
+            (keyup.enter)="onAddStep()"
+            placeholder="Що потрібно зробити?"
+            class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none"
+          />
+          <button
+            (click)="onAddStep()"
+            class="bg-gray-900 hover:bg-black text-white px-6 py-3 rounded-xl font-medium"
+          >
             Додати
           </button>
         </div>
@@ -70,22 +157,58 @@
     }
   </div>
 
-  <div mat-dialog-actions class="p-4 border-t border-gray-100 bg-gray-50 flex justify-between gap-3 m-0">
+  <div
+    mat-dialog-actions
+    class="p-4 border-t border-gray-100 bg-gray-50 flex justify-between gap-3 m-0"
+  >
     @if (task.id !== 0) {
-      <button (click)="onDelete()" class="text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg font-medium transition-colors">
+      <button
+        (click)="onDelete()"
+        class="text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg font-medium transition-colors"
+      >
         Видалити завдання
       </button>
-    } @else { <div></div> }
-    
+    } @else {
+      <div></div>
+    }
+
     <div class="flex gap-2">
-      <button mat-dialog-close class="px-4 py-2 text-gray-700 font-medium hover:bg-gray-200 rounded-lg">
+      <button
+        mat-dialog-close
+        class="px-4 py-2 text-gray-700 font-medium hover:bg-gray-200 rounded-lg"
+      >
         Скасувати
       </button>
-      <button (click)="onSave()" [disabled]="!task.title || !task.categoryId"
-              class="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+      <button
+        (click)="onSave()"
+        [disabled]="!task.title || !task.categoryId"
+        class="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+      >
         {{ task.id === 0 ? 'Створити' : 'Зберегти' }}
       </button>
     </div>
+    <div class="flex items-center">
+      @if (!task.googleEventId) {
+        <button
+          type="button"
+          (click)="addToGoogleCalendar()"
+          [disabled]="isAddingToCalendar || task.id === 0"
+          class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
+        >
+          <ng-icon name="matEvent" class="text-lg text-blue-600"></ng-icon>
+          {{ isAddingToCalendar ? 'Додається...' : 'В Google Календар' }}
+        </button>
+      } @else {
+        <button
+          type="button"
+          (click)="removeFromGoogleCalendar()"
+          [disabled]="isRemovingFromCalendar"
+          class="flex items-center gap-2 px-4 py-2 border border-red-200 rounded-md text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 transition-colors"
+        >
+          <ng-icon name="matDelete" class="text-lg text-red-600"></ng-icon>
+          {{ isRemovingFromCalendar ? 'Видаляється...' : 'Видалити з Календаря' }}
+        </button>
+      }
+    </div>
   </div>
-
 </div>

@@ -2,16 +2,20 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { heroMagnifyingGlassCircleSolid, heroArrowUpSolid, heroArrowDownSolid } from '@ng-icons/heroicons/solid';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 
+import {
+  matSearch,
+  matKeyboardArrowUp,
+  matKeyboardArrowDown,
+} from '@ng-icons/material-icons/baseline';
 
 @Component({
   selector: 'app-header',
   standalone: true,
   imports: [CommonModule, FormsModule, NgIconComponent],
-  providers: [provideIcons({heroMagnifyingGlassCircleSolid, heroArrowUpSolid, heroArrowDownSolid})],
-  templateUrl: `./header.component.html`
+  providers: [provideIcons({ matKeyboardArrowDown, matKeyboardArrowUp, matSearch })],
+  templateUrl: `./header.component.html`,
 })
 export class HeaderComponent {
   @Input() selectedCategoryId: number | null = null;
@@ -19,8 +23,12 @@ export class HeaderComponent {
   @Input() sortBy = 'duedate';
   @Input() sortDescending = false;
 
-
-  @Output() filterChange = new EventEmitter<{term: string, by: string, desc: boolean, categoryId: number | null}>();
+  @Output() filterChange = new EventEmitter<{
+    term: string;
+    by: string;
+    desc: boolean;
+    categoryId: number | null;
+  }>();
   @Output() newTask = new EventEmitter<void>();
   @Output() logout = new EventEmitter<void>();
 
@@ -29,7 +37,7 @@ export class HeaderComponent {
       term: this.searchTerm,
       by: this.sortBy,
       desc: this.sortDescending,
-      categoryId: this.selectedCategoryId
+      categoryId: this.selectedCategoryId,
     });
   }
 

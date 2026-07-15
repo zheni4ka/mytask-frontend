@@ -9,10 +9,10 @@ import { environment } from '../../../../environments/environment';
 })
 export class AuthService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}`;
+  private apiUrl = `${environment.apiUrl}/Auth`;
 
   login(credentials: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/Auth/login`, credentials).pipe(
+    return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
       tap((response) => {
         if (response && response.token) {
           localStorage.setItem('token', response.token);
@@ -20,6 +20,14 @@ export class AuthService {
         }
       }),
     );
+  }
+
+  loginWithGoogle(idToken: string | undefined): Observable<any> {
+    return this.http.post(`${this.apiUrl}/google-login`, { idToken });
+  }
+
+  register(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/register`, data); 
   }
 
   logout() {
@@ -32,7 +40,7 @@ export class AuthService {
       accessToken: localStorage.getItem('token'),
       refreshToken: localStorage.getItem('refreshToken'),
     };
-    return this.http.post<any>(`${this.apiUrl}/Auth/refresh-token`, tokens).pipe(
+    return this.http.post<any>(`${this.apiUrl}/refresh-token`, tokens).pipe(
       tap((response: any) => {
         localStorage.setItem('token', response.token);
         localStorage.setItem('refreshToken', response.refreshToken);
