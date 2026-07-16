@@ -2,11 +2,10 @@ import { ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { authInterceptor } from './core/interceptors/auth/auth-interceptor';
-import { errorInterceptor } from './core/interceptors/error/error-interceptor';
+import { authInterceptor } from './core/interceptors/auth/auth.interceptor';
+import { errorInterceptor } from './core/interceptors/error/error.interceptor';
 
 import {
-  SocialLoginModule,
   SocialAuthServiceConfig,
   GoogleLoginProvider,
   SOCIAL_AUTH_CONFIG,
@@ -28,10 +27,7 @@ export const appConfig: ApplicationConfig = {
               scopes: 'profile email https://www.googleapis.com/auth/calendar.events',
             }),
           },
-        ],
-        onError: (err) => {
-          console.error(err);
-        },
+        ]
       } as SocialAuthServiceConfig,
     },
   ],

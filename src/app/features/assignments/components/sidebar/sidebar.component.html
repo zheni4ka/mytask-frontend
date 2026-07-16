@@ -1,0 +1,132 @@
+<aside class="w-64 bg-white border-r border-gray-200 flex flex-col h-full">
+  <div class="flex flex-row items-center justify-center p-4 border-b border-gray-200">
+    <ng-icon class="text-xl" name="matAssignment" />
+    <h2 class="text-xl font-bold text-gray-800 ml-2">MyTask</h2>
+  </div>
+  <div class="p-4 flex-1 overflow-y-auto">
+    <div class="flex flex-row mt-1 mb-2 gap-4 items-center">
+      <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Категорії</h3>
+      <button
+        (click)="toggleAddCategory()"
+        class="text-xs text-gray-400 hover:text-blue-600 transition-colors"
+      >
+        <ng-icon name="matAdd" class="text-lg"></ng-icon>
+      </button>
+    </div>
+
+    @if (isAddingCategory()) {
+      <div class="mb-3">
+        <input
+          type="text"
+          [(ngModel)]="newCategoryName"
+          (keyup.enter)="saveCategory()"
+          class="w-full text-sm px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+          placeholder="Назва категорії..."
+        />
+        <div class="flex gap-2 mt-2">
+          <button
+            (click)="saveCategory()"
+            class="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700"
+          >
+            Зберегти
+          </button>
+          <button
+            (click)="toggleAddCategory()"
+            class="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded hover:bg-gray-300"
+          >
+            Скасувати
+          </button>
+        </div>
+      </div>
+    }
+    <ul class="space-y-1">
+      <li>
+        <a
+          (click)="onSelect(null, false)"
+          class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+          [ngClass]="
+            selectedCategoryId === null && !isImportantSelected
+              ? 'bg-blue-50 text-blue-700'
+              : 'text-gray-700 hover:bg-gray-100'
+          "
+        >
+          <ng-icon name="matFormatListBulleted" class="text-xl"></ng-icon>
+          Всі завдання
+        </a>
+      </li>
+
+      <li>
+        <a
+          (click)="onSelect(null, true)"
+          class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+          [ngClass]="
+            isImportantSelected ? 'bg-yellow-50 text-yellow-700' : 'text-gray-700 hover:bg-gray-100'
+          "
+        >
+          <ng-icon name="matStar" class="text-xl text-yellow-500"></ng-icon>
+          Важливі
+        </a>
+      </li>
+
+      @for (category of categories; track category.id) {
+        <li
+          class="group flex items-center justify-between px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+          [ngClass]="
+            selectedCategoryId === category.id && editingCategoryId() !== category.id
+              ? 'bg-blue-50 text-blue-700'
+              : 'text-gray-700 hover:bg-gray-100'
+          "
+          (click)="onSelect(category.id, false)"
+        >
+          @if (editingCategoryId() !== category.id) {
+            <span class="text-sm font-medium truncate pr-2">
+              {{ category.name }}
+            </span>
+
+            <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+              <button
+                (click)="startEditCategory($event, category)"
+                class="text-gray-400 hover:text-blue-600 p-1 rounded-md hover:bg-gray-200"
+                title="Редагувати"
+              >
+                <ng-icon name="matEdit" class="text-sm block"></ng-icon>
+              </button>
+              <button
+                (click)="deleteCategory($event, category.id)"
+                class="text-gray-400 hover:text-red-600 p-1 rounded-md hover:bg-gray-200"
+                title="Видалити"
+              >
+                <ng-icon name="matDelete" class="text-sm block"></ng-icon>
+              </button>
+            </div>
+          }
+
+          @if (editingCategoryId() === category.id) {
+            <div class="flex items-center w-full gap-2">
+              <input
+                type="text"
+                [(ngModel)]="editingCategoryName"
+                (keyup.enter)="saveEditCategory()"
+                (click)="$event.stopPropagation()"
+                class="w-full text-sm px-2 py-1 border border-blue-400 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                autofocus
+              />
+              <button
+                (click)="saveEditCategory($event)"
+                class="text-green-600 hover:bg-green-100 p-1 rounded-md"
+              >
+                <ng-icon name="matCheck" class="text-sm block"></ng-icon>
+              </button>
+              <button
+                (click)="cancelEditCategory($event)"
+                class="text-gray-500 hover:bg-gray-200 p-1 rounded-md"
+              >
+                <ng-icon name="matClose" class="text-sm block"></ng-icon>
+              </button>
+            </div>
+          }
+        </li>
+      }
+    </ul>
+  </div>
+</aside>
