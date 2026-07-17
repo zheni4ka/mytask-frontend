@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { isObservable, Observable } from 'rxjs';
 import {
   Assignment,
   CreateAssignmentModel,
@@ -25,6 +25,8 @@ export class AssignmentService {
     sortBy: string,
     sortDescending: boolean,
     isImportant: boolean | null,
+    isCompleted: boolean | null,
+    isOverdue: boolean | null
   ): Observable<PagedResult<Assignment>> {
     let params = new HttpParams()
       .set('pageNumber', pageNumber)
@@ -40,6 +42,15 @@ export class AssignmentService {
     if (isImportant !== undefined && isImportant !== null) {
       params = params.set('IsImportant', isImportant.toString());
     }
+
+    if (isCompleted !== undefined && isCompleted !== null) {
+      params = params.set('isCompleted', isCompleted.toString());
+    }
+
+    if (isOverdue !== undefined && isOverdue !== null) {
+      params = params.set('isOverdue', isOverdue.toString());
+    }
+
     if (sortBy) {
       params = params.set('SortBy', sortBy);
     }

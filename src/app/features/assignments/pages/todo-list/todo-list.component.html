@@ -3,6 +3,8 @@
     [categories]="categories()"
     [selectedCategoryId]="selectedCategoryId()"
     [isImportantSelected]="isImportantFilter()"
+    [isCompletedSelected]="isCompletedFilter()"
+    [isOverdueSelected]="isOverdueFilter()"
     (filterSelect)="onSidebarSelect($event)"
     (categoryCreated)="loadCategories()"
     (categoriesChanged)="onCategoriesChanged()"
@@ -25,6 +27,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
         @for (task of tasks(); track task.id) {
           <app-task-card
+            @listAnimation
             [task]="task"
             (cardClick)="openTask(task)"
             (toggleComplete)="onToggleTaskCompletion(task)"

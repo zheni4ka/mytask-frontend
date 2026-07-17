@@ -4,6 +4,7 @@ import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './core/interceptors/auth/auth.interceptor';
 import { errorInterceptor } from './core/interceptors/error/error.interceptor';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 import {
   SocialAuthServiceConfig,
@@ -16,6 +17,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
+    provideAnimationsAsync(),
     {
       provide: SOCIAL_AUTH_CONFIG,
       useValue: {

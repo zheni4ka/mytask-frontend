@@ -5,6 +5,7 @@ import { AssignmentService } from '../../../../core/services/assignment.service'
 import { CategoryService } from '../../../../core/services/category.service';
 import { StepService } from '../../../../core/services/step.service';
 import { MatDialog } from '@angular/material/dialog';
+import { trigger, transition, style, animate, sequence } from '@angular/animations';
 
 import { TaskCardComponent } from '../../components/assignment-card/assignment-card.component';
 import {
@@ -30,6 +31,21 @@ import { SocialAuthService } from '@abacritt/angularx-social-login';
   standalone: true,
   imports: [CommonModule, FormsModule, SidebarComponent, HeaderComponent, TaskCardComponent],
   templateUrl: './todo-list.component.html',
+  animations: [
+    trigger('listAnimation', [
+      transition(
+        ':enter',
+        sequence([
+          style({ opacity: 0, transform: 'translateY(-20px)' }),
+          animate('300ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
+        ]),
+      ),
+      transition(
+        ':leave',
+        animate('300ms ease-in', style({ opacity: 0, transform: 'translateX(50px)' })),
+      ),
+    ]),
+  ],
 })
 export class TodoListComponent implements OnInit {
   private dialog = inject(MatDialog);
@@ -52,38 +68,33 @@ export class TodoListComponent implements OnInit {
   sortBy = signal('duedate');
   sortDescending = signal(false);
   isImportantFilter = signal<boolean | null>(null);
+  isOverdueFilter = signal<boolean | null>(null);
+  isCompletedFilter = signal<boolean | null>(null);
 
   ngOnInit() {
     this.loadCategories();
 
     this.route.queryParams.subscribe((params) => {
-      const categoryIdParam = params['category'];
-      const importantParam = params['important'];
+    this.isImportantFilter.set(params['important'] === 'true' ? true : null);
+    this.isCompletedFilter.set(params['completed'] === 'true' ? true : null);
+    this.isOverdueFilter.set(params['overdue'] === 'true' ? true : null);
+    
+    this.selectedCategoryId.set(params['category'] ? Number(params['category']) : null);
 
-      if (importantParam === 'true') {
-        this.selectedCategoryId.set(null);
-        this.isImportantFilter.set(true);
-      } else if (categoryIdParam) {
-        this.selectedCategoryId.set(Number(categoryIdParam));
-        this.isImportantFilter.set(null);
-      } else {
-        this.selectedCategoryId.set(null);
-        this.isImportantFilter.set(null);
-      }
-
-      this.loadTasks();
-    });
+    this.loadTasks();
+  });
   }
 
   loadCategories() {
     this.categoryService.getCategories().subscribe((res) => this.categories.set(res));
   }
 
-onLogout() {
+  onLogout() {
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
 
-    this.socialAuthService.signOut()
+    this.socialAuthService
+      .signOut()
       .then(() => {
         this.router.navigate(['/login']);
       })
@@ -102,6 +113,8 @@ onLogout() {
         this.sortBy(),
         this.sortDescending(),
         this.isImportantFilter(),
+        this.isCompletedFilter(),
+        this.isOverdueFilter(),
       )
       .subscribe({
         next: (res: PagedResult<Assignment>) => {
@@ -117,12 +130,17 @@ onLogout() {
 
   loadMoreTasks() {
     if (this.currentPage() < this.totalPages()) {
-      this.currentPage.update((page) => page + 1); 
+      this.currentPage.update((page) => page + 1);
       this.loadTasks(true);
     }
   }
 
-  onSidebarSelect(filter: { categoryId: number | null; important: boolean | null }) {
+  onSidebarSelect(filter: {
+    categoryId: number | null;
+    important: boolean | null;
+    overdue: boolean | null;
+    completed: boolean | null;
+  }) {
     this.searchTerm.set('');
     this.currentPage.set(1);
 
@@ -131,6 +149,8 @@ onLogout() {
       queryParams: {
         category: filter.categoryId,
         important: filter.important ? 'true' : null,
+        completed: filter.completed ? 'true' : null,
+        overdue: filter.overdue ? 'true' : null,
       },
     });
   }
@@ -143,7 +163,12 @@ onLogout() {
         const categoryExists = this.categories().some((c) => c.id === this.selectedCategoryId());
 
         if (!categoryExists && this.selectedCategoryId() !== null) {
-          this.onSidebarSelect({ categoryId: null, important: null });
+          this.onSidebarSelect({
+            categoryId: null,
+            important: null,
+            overdue: null,
+            completed: null,
+          });
         } else {
           this.loadTasks();
         }
@@ -156,8 +181,8 @@ onLogout() {
     this.sortBy.set(filters.by);
     this.sortDescending.set(filters.desc);
     this.selectedCategoryId.set(filters.categoryId);
-    this.currentPage.set(1); 
-    this.loadTasks(); 
+    this.currentPage.set(1);
+    this.loadTasks();
   }
 
   openTask(task: Assignment) {
@@ -183,7 +208,6 @@ onLogout() {
       completedSteps: 0,
     };
     this.openDialog(newTask, []);
-    
   }
 
   private openDialog(task: Assignment, taskSteps: Step[]) {
@@ -191,7 +215,12 @@ onLogout() {
       width: '700px',
       maxWidth: '95vw',
       panelClass: 'custom-dialog-container',
-      data: { task, categories: this.categories(), taskSteps, onStepChanged: () => this.loadTasks() },
+      data: {
+        task,
+        categories: this.categories(),
+        taskSteps,
+        onStepChanged: () => this.loadTasks(),
+      },
     });
 
     dialogRef.afterClosed().subscribe((result) => {

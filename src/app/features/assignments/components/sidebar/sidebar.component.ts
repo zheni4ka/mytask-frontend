@@ -14,8 +14,11 @@ import {
   matFormatListBulleted,
   matEdit, 
   matCheck,
-  matClose
+  matClose,
+  matCheckCircle,
+  matErrorOutline
 } from '@ng-icons/material-icons/baseline';
+import { animate, sequence, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-sidebar',
@@ -30,10 +33,22 @@ import {
     matFormatListBulleted,
     matEdit,
     matCheck,
-    matClose
+    matClose,
+    matCheckCircle,
+    matErrorOutline
   })],
   
   templateUrl: './sidebar.component.html',
+  animations: [
+    trigger('listAnimation', [
+      transition(':enter', sequence([
+        style({ opacity: 0, transform: 'translateY(-20px)' }),
+        animate('300ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ])),
+      transition(':leave', animate('300ms ease-in', style({ opacity: 0, transform: 'translateX(50px)' })))
+      
+    ])
+  ]
 })
 export class SidebarComponent {
   private categoryService = inject(CategoryService);
@@ -41,8 +56,10 @@ export class SidebarComponent {
   @Input() categories: Category[] = [];
   @Input() selectedCategoryId: number | null = null;
   @Input() isImportantSelected: boolean | null = null;
+  @Input() isOverdueSelected: boolean | null = null;
+  @Input() isCompletedSelected: boolean | null = null;
 
-  @Output() filterSelect = new EventEmitter<{categoryId: number | null, important: boolean | null}>();
+  @Output() filterSelect = new EventEmitter<{categoryId: number | null, important: boolean | null, overdue: boolean | null, completed: boolean | null}>();
   @Output() categoriesChanged = new EventEmitter<void>(); 
 
   isAddingCategory = signal(false);
@@ -51,8 +68,8 @@ export class SidebarComponent {
   newCategoryName = '';
   editingCategoryName = '';
 
-  onSelect(id: number | null, important: boolean | null) {
-    this.filterSelect.emit({ categoryId: id, important });
+  onSelect(id: number | null, important: boolean | null, overdue: boolean | null, completed: boolean | null) {
+    this.filterSelect.emit({ categoryId: id, important, overdue, completed });
   }
 
   toggleAddCategory() {
@@ -111,6 +128,36 @@ export class SidebarComponent {
         this.editingCategoryId.set(null);
         this.categoriesChanged.emit();
       }
+    });
+  }
+
+  resetAllFilters() {
+    this.filterSelect.emit({ 
+      categoryId: null, important: null, overdue: null, completed: null 
+    });
+  }
+
+  toggleFilter(filterType: 'important' | 'completed' | 'overdue') {
+    const currentState = {
+      categoryId: this.selectedCategoryId,
+      important: this.isImportantSelected,
+      completed: this.isCompletedSelected,
+      overdue: this.isOverdueSelected
+    };
+
+    if (filterType === 'important') currentState.important = currentState.important ? null : true;
+    if (filterType === 'completed') currentState.completed = currentState.completed ? null : true;
+    if (filterType === 'overdue') currentState.overdue = currentState.overdue ? null : true;
+
+    this.filterSelect.emit(currentState);
+  }
+
+  selectCategory(categoryId: number | null) {
+    this.filterSelect.emit({
+      categoryId: categoryId,
+      important: this.isImportantSelected,
+      completed: this.isCompletedSelected,
+      overdue: this.isOverdueSelected
     });
   }
 }

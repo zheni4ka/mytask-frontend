@@ -34,7 +34,15 @@
         [class.text-gray-400]="task.isCompleted"
         [class.text-gray-800]="!task.isCompleted"
       >
-        {{ task.title }}
+        <span
+          class="transition-colors duration-300 ease-in-out text-lg"
+          [ngClass]="{
+            'text-gray-400 line-through': task.isCompleted,
+            'text-gray-900': !task.isCompleted,
+          }"
+        >
+          {{ task.title }}
+        </span>
       </h3>
     </div>
 

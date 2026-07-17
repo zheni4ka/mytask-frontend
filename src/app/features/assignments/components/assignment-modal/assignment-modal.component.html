@@ -75,7 +75,8 @@
         <div class="space-y-2 mb-5">
           @for (step of taskSteps(); track step.id) {
             <li
-              class="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg group border border-transparent hover:border-gray-200"
+              @stepAnimation
+              class="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg group border border-transparent hover:border-gray-200 overflow-hidden"
             >
               @if (editingStepId !== step.id) {
                 <div

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Assignment } from '../../../../core/models/assignment.model';
 import { provideIcons, NgIconComponent } from '@ng-icons/core';
 import { matLockClock, matCheck } from '@ng-icons/material-icons/baseline';
+import { animate, sequence, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-task-card',

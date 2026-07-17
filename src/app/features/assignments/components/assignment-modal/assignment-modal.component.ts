@@ -16,6 +16,7 @@ import {
 } from '@ng-icons/material-icons/baseline';
 import { SocialAuthService, GoogleLoginProvider } from '@abacritt/angularx-social-login';
 import { AssignmentService } from '../../../../core/services/assignment.service';
+import { animate, sequence, style, transition, trigger } from '@angular/animations';
 
 export interface AssignmentModalData {
   task: Assignment;
@@ -32,6 +33,38 @@ export interface AssignmentModalData {
     provideIcons({ matCheck, matClose, matEdit, matDelete, matEvent }),
   ],
   templateUrl: './assignment-modal.component.html',
+  animations: [
+    trigger('stepAnimation', [
+      transition(':enter', sequence([
+        style({ 
+          opacity: 0, 
+          height: '0px', 
+          overflow: 'hidden',
+          marginBottom: '0px',
+          paddingTop: '0px',
+          paddingBottom: '0px'
+        }),
+        animate('200ms ease-out', style({ 
+          opacity: 1, 
+          height: '*', 
+          marginBottom: '*',
+          paddingTop: '*',
+          paddingBottom: '*'
+        }))
+      ])),
+      
+      transition(':leave', sequence([
+        style({ overflow: 'hidden' }),
+        animate('200ms ease-in', style({ 
+          opacity: 0, 
+          height: '0px', 
+          marginBottom: '0px',
+          paddingTop: '0px',
+          paddingBottom: '0px'
+        }))
+      ]))
+    ])
+  ]
 })
 export class AssignmentModalComponent {
   private stepService = inject(StepService);
