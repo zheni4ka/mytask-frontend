@@ -92,7 +92,7 @@ onLogout() {
       });
   }
 
-  loadTasks() {
+  loadTasks(append: boolean = false) {
     this.assignmentService
       .getAssignments(
         this.currentPage(),
@@ -105,10 +105,21 @@ onLogout() {
       )
       .subscribe({
         next: (res: PagedResult<Assignment>) => {
-          this.tasks.set(res.items);
+          if (append) {
+            this.tasks.update((currentTasks) => [...currentTasks, ...res.items]);
+          } else {
+            this.tasks.set(res.items);
+          }
           this.totalPages.set(res.totalPages);
         },
       });
+  }
+
+  loadMoreTasks() {
+    if (this.currentPage() < this.totalPages()) {
+      this.currentPage.update((page) => page + 1); 
+      this.loadTasks(true);
+    }
   }
 
   onSidebarSelect(filter: { categoryId: number | null; important: boolean | null }) {
@@ -145,7 +156,8 @@ onLogout() {
     this.sortBy.set(filters.by);
     this.sortDescending.set(filters.desc);
     this.selectedCategoryId.set(filters.categoryId);
-    this.loadTasks();
+    this.currentPage.set(1); 
+    this.loadTasks(); 
   }
 
   openTask(task: Assignment) {
@@ -171,6 +183,7 @@ onLogout() {
       completedSteps: 0,
     };
     this.openDialog(newTask, []);
+    
   }
 
   private openDialog(task: Assignment, taskSteps: Step[]) {
@@ -178,7 +191,7 @@ onLogout() {
       width: '700px',
       maxWidth: '95vw',
       panelClass: 'custom-dialog-container',
-      data: { task, categories: this.categories(), taskSteps },
+      data: { task, categories: this.categories(), taskSteps, onStepChanged: () => this.loadTasks() },
     });
 
     dialogRef.afterClosed().subscribe((result) => {
@@ -188,8 +201,6 @@ onLogout() {
         } else if (result.action === 'delete') {
           this.deleteTask(result.taskId);
         }
-      } else {
-        this.loadTasks();
       }
     });
   }

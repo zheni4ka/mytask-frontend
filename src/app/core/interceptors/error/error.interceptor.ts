@@ -45,6 +45,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       notificationService.showError(errorMsg);
 
       return throwError(() => error);
-    })
+    }),
   );
 };

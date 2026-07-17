@@ -28,7 +28,9 @@
             [task]="task"
             (cardClick)="openTask(task)"
             (toggleComplete)="onToggleTaskCompletion(task)"
+            (taskUpdated)="loadTasks()"
           >
+            >
           </app-task-card>
         } @empty {
           <div
@@ -37,6 +39,14 @@
             <h3 class="text-lg font-medium text-gray-900 mb-1">Завдань не знайдено</h3>
           </div>
         }
+      </div>
+      <div *ngIf="currentPage() < totalPages()" class="flex justify-center mt-8 mb-6">
+        <button
+          (click)="loadMoreTasks()"
+          class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+        >
+          Завантажити ще
+        </button>
       </div>
     </div>
   </main>

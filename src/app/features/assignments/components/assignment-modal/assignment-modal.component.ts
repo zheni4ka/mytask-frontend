@@ -1,4 +1,4 @@
-import { Component, Inject, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Inject, inject, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -21,6 +21,7 @@ export interface AssignmentModalData {
   task: Assignment;
   categories: Category[];
   taskSteps: Step[];
+  onStepChanged?: () => void;
 }
 
 @Component({
@@ -47,6 +48,7 @@ export class AssignmentModalComponent {
   taskSteps = signal<Step[]>([]);
   isAddingToCalendar = signal(false);
   isRemovingFromCalendar = signal(false);
+  @Output() taskUpdated = new EventEmitter<void>();
 
   constructor(
     public dialogRef: MatDialogRef<AssignmentModalComponent>,
@@ -54,7 +56,7 @@ export class AssignmentModalComponent {
   ) {
     this.task = { ...data.task };
     this.categories = data.categories;
-    this.taskSteps.set([...data.taskSteps]); 
+    this.taskSteps.set([...data.taskSteps]);
   }
 
   onSave() {
@@ -165,15 +167,29 @@ export class AssignmentModalComponent {
   }
 
   onToggleStep(step: Step) {
+    step.isCompleted = !step.isCompleted;
+
     const updatedStep: UpdateStepModel = {
       id: step.id,
       title: step.title,
       assignmentId: step.assignmentId,
-      isCompleted: !step.isCompleted,
+      isCompleted: step.isCompleted, 
     };
 
     this.stepService.updateStep(updatedStep).subscribe({
-      next: () => this.reloadSteps()
+      next: () => {
+        const currentSteps = this.taskSteps();
+        const completedCount = currentSteps.filter((s) => s.isCompleted).length;
+        
+        this.task.isCompleted = (completedCount === currentSteps.length);
+
+        if (this.data.onStepChanged) {
+          this.data.onStepChanged();
+        }
+      },
+      error: () => {
+        step.isCompleted = !step.isCompleted; 
+      }
     });
   }
 
@@ -181,6 +197,11 @@ export class AssignmentModalComponent {
     this.stepService.getByAssignmentId(this.task.id).subscribe({
       next: (steps) => {
         this.taskSteps.set(steps); 
+        const completedCount = steps.filter(s => s.isCompleted).length;
+        this.task.isCompleted = (steps.length > 0 && completedCount === steps.length);
+        if (this.data.onStepChanged) {
+          this.data.onStepChanged();
+        }
       },
     });
   }

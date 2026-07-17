@@ -69,6 +69,7 @@ export class LoginComponent implements OnInit {
       },
       error: (err) => {
         this.isLoading.set(false);
+        console.log(err);
       },
     });
   }

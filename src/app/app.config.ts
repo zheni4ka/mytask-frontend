@@ -25,6 +25,7 @@ export const appConfig: ApplicationConfig = {
             id: GoogleLoginProvider.PROVIDER_ID,
             provider: new GoogleLoginProvider(environment.googleAPIkey, {
               scopes: 'profile email https://www.googleapis.com/auth/calendar.events',
+              prompt: ''
             }),
           },
         ]
